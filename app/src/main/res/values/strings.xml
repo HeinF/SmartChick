@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SmartChick</string>
+    <string name="app_name">SmartChicken</string>
     <string name="blue_no_paired">No Paired Devices</string>
     <string name="blue_no_devices">No Devices Found</string>
 </resources>

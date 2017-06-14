@@ -54,7 +54,7 @@ public class BlueActivity extends AppCompatActivity {
     private ServiceConnection serviceConn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
-            Toast.makeText(BlueActivity.this,"Bound!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(BlueActivity.this,"Bound!", Toast.LENGTH_LONG).show();
             Log.d(TAG, "onServiceConnected");
             bound = true;
             blueServiceMessenger = new Messenger(binder);
