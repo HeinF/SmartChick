@@ -100,14 +100,19 @@ public class BlueActivity extends AppCompatActivity {
         operate = (Button) findViewById(R.id.buttonOperate);
         operate.setEnabled(false);
         btOnOff = (Switch) findViewById(R.id.switchEnableBT);
+
+        searchBtn.setEnabled(false);
+        btOnOff.setChecked(false);
+        btOnOff.setEnabled(false);
         if(btAdapter != null){
             btOnOff.setEnabled(true);
             if (btAdapter.isEnabled()){
+                searchBtn.setEnabled(true);
                 btOnOff.setChecked(true);
                 getPairedDevices();
-            } else {
-                btOnOff.setChecked(false);
             }
+        } else{
+            Toast.makeText(BlueActivity.this,"Sorry, your device does not support bluetooth!", Toast.LENGTH_LONG).show();
         }
 
         IntentFilter filter = new IntentFilter();
@@ -170,8 +175,11 @@ public class BlueActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Intent intent = new Intent(this, BluetoothConnService.class);
-        bindService(intent, serviceConn, Context.BIND_AUTO_CREATE);
+        if(btAdapter != null){
+            Intent intent = new Intent(this, BluetoothConnService.class);
+            bindService(intent, serviceConn, Context.BIND_AUTO_CREATE);
+        }
+
     }
 
     @Override
@@ -194,8 +202,7 @@ public class BlueActivity extends AppCompatActivity {
         if(btAdapter == null){
             Log.d(TAG, "Device does not have bluetooth");
             //Device does not support bluetooth
-        }
-        if(!btAdapter.isEnabled()){
+        } else if(!btAdapter.isEnabled()){
             Log.d(TAG, "BT not enabled");
             Log.d(TAG, "Trying to enable BT");
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -204,12 +211,14 @@ public class BlueActivity extends AppCompatActivity {
     }
 
     private void doDiscover(){
-        Log.d(TAG, "Starting Discovery");
-        if(btAdapter.isDiscovering()){
-            btAdapter.cancelDiscovery();
+        if(btAdapter != null && btAdapter.isEnabled()){
+            Log.d(TAG, "Starting Discovery");
+            if(btAdapter.isDiscovering()){
+                btAdapter.cancelDiscovery();
+            }
+            newDevicesAdapter.clear();
+            btAdapter.startDiscovery();
         }
-        newDevicesAdapter.clear();
-        btAdapter.startDiscovery();
     }
 
     private void getPairedDevices(){
@@ -259,10 +268,13 @@ public class BlueActivity extends AppCompatActivity {
         switch(requestCode){
             case REQUEST_ENABLE_BT:
                 if(resultCode == Activity.RESULT_OK){
+                    searchBtn.setEnabled(true);
                     getPairedDevices();
+                    break;
                 } else {
                     Log.d(TAG, "Failed to enable bluetooth");
                     btOnOff.setChecked(false);
+                    break;
                 }
         }
     }
